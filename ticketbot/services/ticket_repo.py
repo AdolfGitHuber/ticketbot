@@ -43,7 +43,7 @@ class TicketRepository:
     async def change_ticket_state(
         self,
         ticket_id: int,
-        state: TicketState
+        state: str
     ) -> Ticket:
         """
         Change ticket state
@@ -111,16 +111,18 @@ class TicketRepository:
                 select(Ticket)
                 .where(
                     Ticket.department == department_id,
-                    Ticket.state == (TicketState.CLOSED if closed else TicketState.OPEN)
+                    Ticket.state == ('closed' if closed else 'open')
                 )
             )
+
         elif isinstance(department_id, list):
             result = await self.session.execute(
                 select(Ticket)
                 .where(
                     Ticket.department.in_(department_id),
-                    Ticket.state == (TicketState.CLOSED if closed else TicketState.OPEN)
+                    Ticket.state == ('closed' if closed else 'open')
                 )
                 .order_by(Ticket.department)
             )
+            
         return result.scalars().all()

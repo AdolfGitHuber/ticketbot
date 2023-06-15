@@ -34,7 +34,6 @@ class UserRepository:
         :param telegram_id: <event>.from_user.id
         :param username: <event>.from_user.username
         :param first_name: <event>.from_user.first_name
-        :param role: Enum of UserRole (default: UserRole.UNREGISTERED)
         :return: NoReturn
         """
         query = insert(User).values(
@@ -115,7 +114,7 @@ class UserRepository:
         """
         result = await self.session.execute(
             select(User)
-            .where(User.role == UserRole.ADMIN)
+            .where(User.role == 'admin')
         )
         return result.scalars().all()
     
@@ -138,3 +137,8 @@ class UserRepository:
             select(User)
         )
         return result.scalars().all()
+
+    async def get_user_color(self, tg_id: int) -> User:
+        query = select(User).where(User.telegram_id == tg_id)
+        result = await self.session.execute(query)
+        return result.scalars().first()

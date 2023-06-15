@@ -22,17 +22,16 @@ async def send_ticket(
     
     dep_users = await UserRepository(session).get_department_users(department.id)
 
-    if state == TicketState.OPEN:
+    if state == 'open':
         text = [
             f"Новая заявка: <code>#{ticket_number}</code>\n",
         ]
-    if state == TicketState.CLOSED:
+    if state == 'closed':
         text = [
             f"Заявка <code>#{ticket_number}</code> выполнена!\n",
         ]
 
     text.extend(f"<b>{ticket_text}</b>\n")
-
 
     for user in dep_users:
         with suppress(TelegramForbiddenError):

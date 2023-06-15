@@ -33,8 +33,8 @@ class Ticket(Base):
         primary_key=True
         )
     ticket_text = Column(String, nullable=False)
-    ticket_creation_date = Column(DateTime(timezone=True), server_default=func.now())
-    state = Column(Enum(TicketState), default=TicketState.OPEN)
+    creation_date = Column(DateTime(timezone=True), default=func.now())
+    state = Column(String, default='open', nullable=False)
     
 
     author = Column(BigInteger, ForeignKey("user.telegram_id"))

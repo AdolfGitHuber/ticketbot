@@ -1,1 +1,5 @@
 __pycache__/
+.gitignore
+*.xlsx
+config.ini
+google_creds/*

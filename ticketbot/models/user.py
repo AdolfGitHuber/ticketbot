@@ -1,6 +1,6 @@
 from sqlalchemy import (
     Column, 
-    BigInteger,
+    Integer,
     String,
     Enum
 )
@@ -18,10 +18,12 @@ role TEXT NOT NULL
 class User(Base):
     __tablename__ = 'user'
 
-    telegram_id = Column(BigInteger, primary_key=True)
+    id = Column(Integer, primary_key=True)
+    telegram_id = Column(Integer, nullable=False)
     username = Column(String(32), nullable=True)
     first_name = Column(String(32), nullable=True)
-    role = Column(Enum(UserRole), nullable=True)
+    role = Column(String, default='unregistered')
+    color = Column(String)
 
     tickets = relationship("Ticket", back_populates="author_id", lazy="selectin")
     departments = relationship("UserDepartment", back_populates="user", lazy="selectin")

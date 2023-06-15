@@ -1,3 +1,0 @@
-aiogram==2.24
-Faker==16.6.0
-SQLAlchemy==1.4.46
