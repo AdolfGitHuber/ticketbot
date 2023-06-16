@@ -10,7 +10,7 @@ from . import Base
 class UserDepartment(Base):
     __tablename__ = 'user_department'
 
-    user_id = Column(ForeignKey("user.telegram_id"), primary_key=True)
+    user_id = Column(ForeignKey("user.id"), primary_key=True)
     department_id = Column(ForeignKey("department.id"), primary_key=True)
 
     user = relationship("User", back_populates="departments", lazy="selectin")
