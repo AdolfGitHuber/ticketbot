@@ -3,12 +3,8 @@ from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.dialects.postgresql import insert
 
-from ticketbot.models.user import User
-from ticketbot.models.ticket import Ticket
-from ticketbot.models.department import Department
-from ticketbot.models.user_department import UserDepartment
-from ticketbot.models.enum.role import UserRole
-from ticketbot.models.enum.department import EnumDep
+from ticketbot.models import User, Ticket, Department, UserDepartment
+from ticketbot.models.enum import UserRole, EnumDep
 
 
 

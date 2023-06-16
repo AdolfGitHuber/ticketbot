@@ -4,7 +4,7 @@ from typing import Dict, Any
 from aiogram.filters import BaseFilter
 from aiogram.types import Message, CallbackQuery
 
-from ticketbot.models.enum.role import UserRole
+from ticketbot.models.enum import UserRole
 
 logger = logging.getLogger(__name__)
 
@@ -21,6 +21,7 @@ class UserMessageTicketFilter(BaseFilter):
                     except ValueError:
                         return False
                 return False
+
 
 class AdminFilter(BaseFilter):
     async def __call__(

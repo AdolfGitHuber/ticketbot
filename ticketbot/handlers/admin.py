@@ -9,10 +9,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ticketbot.filters.user_filter import AdminFilter
 from ticketbot.states.admin import AdminFSM
-from ticketbot.models.enum.department import EnumDep
-from ticketbot.services.user_repo import UserRepository
-from ticketbot.utils import keyboards
-from ticketbot.utils.get_tickets import get_tickets_io
+from ticketbot.models.enum import EnumDep
+from ticketbot.services import UserRepository
+from ticketbot.utils import Keyboards, get_tickets_io
 
 logger = logging.getLogger(__name__)
 admin_router = Router()
@@ -25,7 +24,7 @@ async def admin_menu(
     await state.set_state(AdminFSM.admin_menu)
     await message.answer(
         text="Я есть меню",
-        reply_markup=keyboards.admin_menu_keyboard_main()
+        reply_markup=Keyboards()().admin_menu_keyboard_main()
     )
 
 
@@ -41,7 +40,7 @@ async def admin_menu_tickets(
     await query.answer()
     await query.message.edit_text(
         text="Выберите тип заявок",
-        reply_markup=keyboards.admin_menu_keyboard_tickets_state()
+        reply_markup=Keyboards()().admin_menu_keyboard_tickets_state()
     )
 
 
@@ -61,7 +60,7 @@ async def admin_menu_ticket_state(
     await query.answer()
     await query.message.edit_text(
         text="Выберите отделение",
-        reply_markup=keyboards.department_keyboard(True)
+        reply_markup=Keyboards()().department_keyboard(True)
     )
 
 
@@ -110,7 +109,7 @@ async def admin_menu_management(
     async with session:
         users = await UserRepository(session).get_all_users()
 
-    keyboard = keyboards.admin_menu_users_keyboard(users)
+    keyboard = Keyboards().admin_menu_users_keyboard(users)
     await query.message.edit_text(
         text='Выберите испытуемого',
         reply_markup=keyboard,
@@ -131,7 +130,7 @@ async def admin_mgmt_dep_select(
     await state.update_data({'mgmt_user': user})
     await query.message.edit_text(
         text='Выберите действие',
-        reply_markup=keyboards.admin_menu_keyboard_management()
+        reply_markup=Keyboards().admin_menu_keyboard_management()
     )
 
 
@@ -149,13 +148,13 @@ async def admin_menu_add_user_dep(
 
     if query.data == 'admin_add_user_dep':
         await state.update_data({'mgmt_user_action': 'add'})
-        keyboard = keyboards.department_keyboard()
+        keyboard = Keyboards().department_keyboard()
     if query.data == 'admin_remove_user_dep':
         await state.update_data({'mgmt_user_action': 'remove'})
         async with session:
             user = await UserRepository(session).get_user_by_telegram_id(data['mgmt_user'])
         departments = [dep.department.name for dep in user.departments]
-        keyboard = keyboards.user_department_keyboard(departments)
+        keyboard = Keyboards().user_department_keyboard(departments)
 
 
     await query.message.edit_text(

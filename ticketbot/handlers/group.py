@@ -9,13 +9,10 @@ from aiogram.exceptions import TelegramForbiddenError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ticketbot.filters.group_filter import TicketCreateFilter
-from ticketbot.models.enum.department import EnumDep
-from ticketbot.models.enum.ticket_state import TicketState
-from ticketbot.services.ticket_repo import TicketRepository
-from ticketbot.services.user_repo import UserRepository
+from ticketbot.models.enum import EnumDep, TicketState
+from ticketbot.services import TicketRepository, UserRepository
 from ticketbot.states.ticket import TicketFSM
-from ticketbot.utils.keyboards import department_keyboard
-from ticketbot.utils.send_ticket import send_ticket
+from ticketbot.utils import Keyboards, send_ticket
 
 group_router = Router()
 logger = logging.getLogger(__name__)
@@ -32,7 +29,7 @@ async def acquire_ticket(
     
     await message.answer(
         text="Выберите отдел",
-        reply_markup=department_keyboard()
+        reply_markup=Keyboards().department_keyboard()
     )
 
 

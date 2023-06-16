@@ -11,8 +11,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
-from ticketbot.models.base import Base
-from ticketbot.models.enum.ticket_state import TicketState
+from . import Base
 
 
 

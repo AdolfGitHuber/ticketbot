@@ -2,7 +2,7 @@ from aiogram import F, Bot
 from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 
-from ticketbot.services.user_repo import UserRepo
+from ticketbot.services import UserRepo
 
 
 async def register_user(message: Message, state: FSMContext):

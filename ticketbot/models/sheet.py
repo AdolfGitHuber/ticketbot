@@ -9,8 +9,7 @@ from sqlalchemy import (
     Identity,
     func
 )
-from ticketbot.models.base import Base
-
+from . import Base
 
 class Sheet:
     __tablename__ = 'sheet'

@@ -6,8 +6,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import relationship
 
-from ticketbot.models.base import Base
-from ticketbot.models.enum.role import UserRole
+from . import Base
 
 
 """

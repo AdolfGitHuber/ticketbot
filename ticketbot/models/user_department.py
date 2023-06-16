@@ -4,7 +4,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import relationship
 
-from ticketbot.models.base import Base
+from . import Base
 
 
 class UserDepartment(Base):

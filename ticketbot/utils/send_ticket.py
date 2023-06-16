@@ -7,9 +7,8 @@ from aiogram.exceptions import TelegramForbiddenError
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ticketbot.models.enum.department import EnumDep
-from ticketbot.models.enum.ticket_state import TicketState
-from ticketbot.services.user_repo import UserRepository
+from ticketbot.models.enum import EnumDep, TicketState
+from ticketbot.services import UserRepository
 
 async def send_ticket(
     session: AsyncSession,

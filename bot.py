@@ -11,13 +11,10 @@ from sqlalchemy.ext.asyncio import (
 )
 
 from ticketbot.config import load_config
-from ticketbot.handlers.group import group_router
-from ticketbot.handlers.user import user_router
-from ticketbot.handlers.admin import admin_router
+from ticketbot.handlers import admin_router, group_router, user_router
 from ticketbot.filters.user_filter import AdminFilter
-from ticketbot.utils.debug_util import debug_router
-from ticketbot.middlewares.db import DbSessionMiddleware
-from ticketbot.middlewares.role import RoleMiddleware
+from ticketbot.utils import debug_router, GoogleSheetTracker
+from ticketbot.middlewares import DbSessionMiddleware, RoleMiddleware
 from ticketbot.models.base import Base
 
 
@@ -32,7 +29,7 @@ async def main():
         )
     logger.error("Starting bot")
     
-    config = load_config("config.ini")
+    config = load_config("config/config.ini")
     
     #database config
     # engine = create_async_engine(
@@ -80,14 +77,5 @@ async def main():
         await dp.storage.wait_closed()
         await bot.session.close()
 
-
-def cli():
-    """Wrapper for command line"""
-    try:
-        asyncio.run(main())
-    except (KeyboardInterrupt, SystemExit):
-        logger.error("Bot stopped!")
-
-
 if __name__ == '__main__':
-    cli()
+    asyncio.run(main())

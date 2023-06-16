@@ -10,13 +10,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ticketbot.states.user import UserStates
 from ticketbot.filters.user_filter import UserMessageTicketFilter
-from ticketbot.services.user_repo import UserRepository
-from ticketbot.services.ticket_repo import TicketRepository
-from ticketbot.models.enum.department import EnumDep
-from ticketbot.models.enum.ticket_state import TicketState
-from ticketbot.utils.keyboards import user_menu_keyboard
-from ticketbot.utils.send_ticket import send_ticket
-from ticketbot.utils.get_tickets import get_tickets_io
+from ticketbot.services import UserRepository, TicketRepository
+from ticketbot.models.enum import EnumDep, TicketState
+from ticketbot.utils import Keyboards, send_ticket, get_tickets_io
 
 user_router = Router()
 logger = logging.getLogger(__name__)
@@ -28,10 +24,10 @@ async def user_start(
     ) -> None:
     
     await state.set_state(UserStates.menu)
-
+    
     await message.answer(
         text="Меню заявок",
-        reply_markup=user_menu_keyboard(),
+        reply_markup=Keyboards().user_menu_keyboard(),
     )
 
 

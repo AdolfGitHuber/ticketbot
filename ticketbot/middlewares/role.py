@@ -4,8 +4,8 @@ from typing import Any, Awaitable, Callable, Dict
 from aiogram import BaseMiddleware
 from aiogram.types import Message
 
-from ticketbot.models.enum.role import UserRole
-from ticketbot.services.user_repo import UserRepository
+from ticketbot.models.enum import UserRole
+from ticketbot.services import UserRepository
 
 logger = logging.getLogger(__name__)
 

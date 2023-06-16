@@ -1,7 +1,5 @@
-from ticketbot.models.user import User
-from ticketbot.models.ticket import Ticket
-from ticketbot.models.department import Department
-from ticketbot.models.enum.ticket_state import TicketState
+from ticketbot.models import User, Ticket, Department
+from ticketbot.models.enum import TicketState
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.dialects.postgresql import insert

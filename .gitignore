@@ -3,3 +3,5 @@ __pycache__/
 *.xlsx
 config.ini
 google_creds/*
+config/service_account.json
+bot1.py

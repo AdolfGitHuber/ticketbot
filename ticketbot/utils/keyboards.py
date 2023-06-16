@@ -1,97 +1,102 @@
 from aiogram import types
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from ticketbot.models.enum.department import EnumDep
-from ticketbot.models.user import User
+from ticketbot.models import User
+from ticketbot.models.enum import EnumDep
 
 
-def department_keyboard(all: bool = False) -> types.InlineKeyboardMarkup:
-    builder = InlineKeyboardBuilder()
-    for dep in EnumDep:
-        builder.row(
-            types.InlineKeyboardButton(
-                text=dep.title, callback_data=dep.name
+class Keyboards(InlineKeyboardBuilder):
+    def __init__(self):
+        super().__init__()
+
+
+    def department_keyboard(self, all: bool = False) -> types.InlineKeyboardMarkup:
+        for dep in EnumDep:
+            self.row(
+                types.InlineKeyboardButton(
+                    text=dep.title, callback_data=dep.name
+                    )
+                )
+        if all:
+            self.row(
+                types.InlineKeyboardButton(text='Все отделы', callback_data='all_departments_tickets')
+            )
+        return self.as_markup()
+
+
+    def user_department_keyboard(self, departments: list) -> types.InlineKeyboardMarkup:
+        builder = InlineKeyboardBuilder()
+        for dep in departments:
+            self.row(
+                types.InlineKeyboardButton(
+                    text=EnumDep[dep].title, callback_data=dep
                 )
             )
-    if all:
-        builder.row(
-            types.InlineKeyboardButton(text='Все отделы', callback_data='all_departments_tickets')
-        )
-    return builder.as_markup()
+        return self.as_markup()
 
-def user_department_keyboard(departments: list) -> types.InlineKeyboardMarkup:
-    builder = InlineKeyboardBuilder()
-    for dep in departments:
-        builder.row(
+    def user_menu_keyboard(self) -> types.InlineKeyboardMarkup:
+        builder = InlineKeyboardBuilder()
+        self.add(
             types.InlineKeyboardButton(
-                text=EnumDep[dep].title, callback_data=dep
+                text='Заявки', callback_data='dep_user_open_tickets'
             )
         )
-    return builder.as_markup()
+        return self.as_markup()
 
-def user_menu_keyboard() -> types.InlineKeyboardMarkup:
-    builder = InlineKeyboardBuilder()
-    builder.add(
-        types.InlineKeyboardButton(
-            text='Заявки', callback_data='dep_user_open_tickets'
-        )
-    )
-    return builder.as_markup()
-
-def admin_menu_keyboard_main() -> types.InlineKeyboardMarkup:
-    builder = InlineKeyboardBuilder()
-    builder.add(
-        types.InlineKeyboardButton(
-            text='Заявки', callback_data='admin_dep_tickets'
-        ),
-        types.InlineKeyboardButton(
-            text='Управление', callback_data='admin_management'
-        )
-    )
-    builder.adjust(1)
-    return builder.as_markup()
-
-def admin_menu_keyboard_tickets_state() -> types.InlineKeyboardMarkup:
-    builder = InlineKeyboardBuilder()
-    builder.add(
-        types.InlineKeyboardButton(text='Не выполнено', callback_data='admin_open_tickets'),
-        types.InlineKeyboardButton(text='Выполнено', callback_data='admin_closed_tickets')
-    )
-    builder.adjust(1)
-    return builder.as_markup()
-
-def admin_menu_keyboard_tickets() -> types.InlineKeyboardMarkup:
-    builder = InlineKeyboardBuilder()
-    for dep in EnumDep:
-        builder.row(
+    def admin_menu_keyboard_main(self) -> types.InlineKeyboardMarkup:
+        builder = InlineKeyboardBuilder()
+        self.add(
             types.InlineKeyboardButton(
-                text=dep.title, callback_data=f"admin_{dep.name}"
+                text='Заявки', callback_data='admin_dep_tickets'
+            ),
+            types.InlineKeyboardButton(
+                text='Управление', callback_data='admin_management'
+            )
+        )
+        self.adjust(1)
+        return self.as_markup()
+
+    def admin_menu_keyboard_tickets_state(self) -> types.InlineKeyboardMarkup:
+        builder = InlineKeyboardBuilder()
+        self.add(
+            types.InlineKeyboardButton(text='Не выполнено', callback_data='admin_open_tickets'),
+            types.InlineKeyboardButton(text='Выполнено', callback_data='admin_closed_tickets')
+        )
+        self.adjust(1)
+        return self.as_markup()
+
+    def admin_menu_keyboard_tickets(self) -> types.InlineKeyboardMarkup:
+        builder = InlineKeyboardBuilder()
+        for dep in EnumDep:
+            self.row(
+                types.InlineKeyboardButton(
+                    text=dep.title, callback_data=f"admin_{dep.name}"
+                    )
+                )
+        return self.as_markup()
+
+    def admin_menu_keyboard_management(self) -> types.InlineKeyboardMarkup:
+        builder = InlineKeyboardBuilder()
+        self.add(
+            types.InlineKeyboardButton(
+                text='Назначить пользователя в отдел', callback_data='admin_add_user_dep'
+            ),
+            types.InlineKeyboardButton(
+                text='Удалить пользователя из отдела', callback_data='admin_remove_user_dep'
+            )
+        )
+        self.adjust(1)
+        return self.as_markup()
+
+    def admin_menu_users_keyboard(self, users: list[User]) -> types.InlineKeyboardMarkup:
+        builder = InlineKeyboardBuilder()
+        for user in users:
+            self.add(types.InlineKeyboardButton(
+                    text=user.username if user.username else user.first_name,
+                    callback_data=f"mgmt_{user.telegram_id}"
                 )
             )
-    return builder.as_markup()
-
-def admin_menu_keyboard_management() -> types.InlineKeyboardMarkup:
-    builder = InlineKeyboardBuilder()
-    builder.add(
-        types.InlineKeyboardButton(
-            text='Назначить пользователя в отдел', callback_data='admin_add_user_dep'
-        ),
-        types.InlineKeyboardButton(
-            text='Удалить пользователя из отдела', callback_data='admin_remove_user_dep'
-        )
-    )
-    builder.adjust(1)
-    return builder.as_markup()
-
-def admin_menu_users_keyboard(users: list[User]) -> types.InlineKeyboardMarkup:
-    builder = InlineKeyboardBuilder()
-    for user in users:
-        builder.add(types.InlineKeyboardButton(
-                text=user.username if user.username else user.first_name,
-                callback_data=f"mgmt_{user.telegram_id}"
-            )
-        )
-    builder.adjust(2)
-    return builder.as_markup()
+        self.adjust(2)
+        return self.as_markup()
 
 
