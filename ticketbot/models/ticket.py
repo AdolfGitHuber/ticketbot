@@ -44,9 +44,7 @@ class Ticket(Base):
 
     def __repr__(self):
         return (f"Ticket("
-                f"id={self.ticket_id!r},\n"
-                f"text={self.ticket_text!r},\n"
-                f"creation_date={self.ticket_creation_date!r},\n"
-                f"state={self.state!r})\n"
-                f"author={self.author!r}\n"
-                f"department={self.department!r}")
+                f"id={self.ticket_id!r}, "
+                f"text={self.ticket_text!r}, "
+                f"creation_date={self.ticket_creation_date!r}, "
+                f"state={self.state!r})")

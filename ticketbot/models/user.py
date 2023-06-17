@@ -31,8 +31,8 @@ class User(Base):
 
     def __repr__(self):
         return (
-            f"User(telegram_id={self.telegram_id!r}\n"
-            f"username={self.username!r}\n"
-            f"first_name={self.first_name!r}\n"
-            f"role={self.role!r})\n"
+            f"User(telegram_id={self.telegram_id!r}, "
+            f"username={self.username!r}, "
+            f"first_name={self.first_name!r}, "
+            f"role={self.role!r})"
             )
