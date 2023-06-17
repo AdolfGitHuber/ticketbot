@@ -2,7 +2,7 @@ from sqlalchemy import (
     Column, 
     Integer,
     String,
-    Enum
+    ForeignKey
 )
 from sqlalchemy.orm import relationship
 
@@ -22,10 +22,11 @@ class User(Base):
     username = Column(String(32), nullable=True)
     first_name = Column(String(32), nullable=True)
     role = Column(String, default='unregistered')
-    color = Column(String)
 
-    tickets = relationship("Ticket", back_populates="author_id", lazy="selectin")
-    departments = relationship("UserDepartment", back_populates="user", lazy="selectin")
+    color_id = Column(Integer, ForeignKey("color.id"), unique=True)
+    color = relationship("Color", back_populates="user_clr")
+    tickets = relationship("Ticket", back_populates="author_id")
+    departments = relationship("UserDepartment", back_populates="user")
 
 
     def __repr__(self):
@@ -34,5 +35,4 @@ class User(Base):
             f"username={self.username!r}\n"
             f"first_name={self.first_name!r}\n"
             f"role={self.role!r})\n"
-            f"tickets={self.tickets!r}"
             )

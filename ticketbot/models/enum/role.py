@@ -8,3 +8,4 @@ class UserRole(Enum):
     @classmethod
     def get_roles(self):
         return [role.value for role in UserRole]
+    

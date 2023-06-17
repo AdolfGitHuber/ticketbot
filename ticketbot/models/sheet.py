@@ -11,7 +11,7 @@ from sqlalchemy import (
 )
 from . import Base
 
-class Sheet:
+class Sheet(Base):
     __tablename__ = 'sheet'
 
     id = Column(Integer, primary_key=True)
@@ -19,8 +19,8 @@ class Sheet:
     color = Column(String)
     value = Column(String)
     date = Column(DateTime(timezone=True), default=func.now())
-    worker = Column(Integer, ForeignKey("user.id"))
 
+    
     def __repr__(self):
         return (f"Sheet(id={self.id!r}, "
                 f"cell={self.cell!r}, "

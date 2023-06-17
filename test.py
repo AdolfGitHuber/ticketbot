@@ -1,54 +1,81 @@
 import json
-import webcolors
 import colorsys
+import asyncio
+import random
 
-colors = [{1: '0, 0, 0'}, {11: '0.59607846, 0, 0'}, {21: '0.9019608, 0.72156864, 0.6862745'}, {31: '0.8666667, 0.49411765, 0.41960785'}, {41: '0.8, 0.25490198, 0.14509805'}, {51: '0.6509804, 0.10980392, 0'}, {61: '0.52156866, 0.1254902, 0.047058824'}, {71: '0.35686275, 0.05882353, 0'},
-{2: '0.2627451, 0.2627451, 0.2627451'}, {12: '1, 0, 0'}, {22: '0.95686275, 0.8, 0.8'}, {32: '0.91764706, 0.6, 0.6'}, {42: '0.8784314, 0.4, 0.4'}, {52: '0.8, 0, 0'}, {62: '0.6, 0, 0'}, {72: '0.4, 0, 0'},
-{3: '0.4, 0.4, 0.4'}, {13: '1, 0.6, 0'}, {23: '0.9882353, 0.8980392, 0.8039216'}, {33: '0.9764706, 0.79607844, 0.6117647'}, {43: '0.9647059, 0.69803923, 0.41960785'}, {53: '0.9019608, 0.5686275, 0.21960784'}, {63: '0.7058824, 0.37254903, 0.023529412'}, {73: '0.47058824, 0.24705882, 0.015686275'},
-{4: '0.6, 0.6, 0.6'}, {14: '1, 1, 0'}, {24: '1, 0.9490196, 0.8'}, {34: '1, 0.8980392, 0.6'}, {44: '1, 0.8509804, 0.4'}, {54: '0.94509804, 0.7607843, 0.19607843'}, {64: '0.7490196, 0.5647059, 0'}, {74: '0.49803922, 0.3764706, 0'},
-{5: '0.7176471, 0.7176471, 0.7176471'}, {15: '0, 1, 0'}, {25: '0.8509804, 0.91764706, 0.827451'}, {35: '0.7137255, 0.84313726, 0.65882355'}, {45: '0.5764706, 0.76862746, 0.49019608'}, {55: '0.41568628, 0.65882355, 0.30980393'}, {65: '0.21960784, 0.4627451, 0.11372549'}, {75: '0.15294118, 0.30588236, 0.07450981'},
-{6: '0.8, 0.8, 0.8'}, {16: '0, 1, 1'}, {26: '0.8156863, 0.8784314, 0.8901961'}, {36: '0.63529414, 0.76862746, 0.7882353'}, {46: '0.4627451, 0.64705884, 0.6862745'}, {56: '0.27058825, 0.5058824, 0.5568628'}, {66: '0.07450981, 0.30980393, 0.36078432'}, {76: '0.047058824, 0.20392157, 0.23921569'},
-{7: '0.8509804, 0.8509804, 0.8509804'}, {17: '0.2901961, 0.5254902, 0.9098039'}, {27: '0.7882353, 0.85490197, 0.972549'}, {37: '0.6431373, 0.7607843, 0.95686275'}, {47: '0.42745098, 0.61960787, 0.92156863'}, {57: '0.23529412, 0.47058824, 0.84705883'}, {67: '0.06666667, 0.33333334, 0.8'}, {77: '0.10980392, 0.27058825, 0.5294118'},
-{8: '0.9372549, 0.9372549, 0.9372549'}, {18: '0, 0, 1'}, {28: '0.8117647, 0.8862745, 0.9529412'}, {38: '0.62352943, 0.77254903, 0.9098039'}, {48: '0.43529412, 0.65882355, 0.8627451'}, {58: '0.23921569, 0.52156866, 0.7764706'}, {68: '0.043137256, 0.3254902, 0.5803922'}, {78: '0.10980392, 0.27058825, 0.5294118'},
-{9: '0.9529412, 0.9529412, 0.9529412'}, {19: '0.6, 0, 1'}, {29: '0.8509804, 0.8235294, 0.9137255'}, {39: '0.7058824, 0.654902, 0.8392157'}, {49: '0.5568628, 0.4862745, 0.7647059'}, {59: '0.40392157, 0.30588236, 0.654902'}, {69: '0.20784314, 0.10980392, 0.45882353'}, {79: '0.1254902, 0.07058824, 0.3019608'},
-{10: '1, 1, 1'}, {20: '1, 0, 1'}, {30: '0.91764706, 0.81960785, 0.8627451'}, {40: '0.8352941, 0.6509804, 0.7411765'}, {50: '0.7607843, 0.48235294, 0.627451'}, {60: '0.6509804, 0.3019608, 0.4745098'}, {70: '0.45490196, 0.105882354, 0.2784314'}, {80: '0.29803923, 0.06666667, 0.1882353'}]
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
+from sqlalchemy import insert, update, select
+from ticketbot.models import Base, Color, User
+from ticketbot.models.enum import UserRole
+from ticketbot.services import SheetRepository, UserRepository, TicketRepository
 
 
-def closest_colour(requested_colour):
-    min_colours = {}
-    for key, name in webcolors.CSS3_HEX_TO_NAMES.items():
-        r_c, g_c, b_c = webcolors.hex_to_rgb(key)
-        rd = (r_c - requested_colour[0]) ** 2
-        gd = (g_c - requested_colour[1]) ** 2
-        bd = (b_c - requested_colour[2]) ** 2
-        min_colours[(rd + gd + bd)] = name
-    return min_colours[min(min_colours.keys())]
+colors = {
+    '0, 1, 0': ['Зеленый', 'Лозицкий'],
+    '1, 1, 0': ['Желтый', 'Кожиков'],
+    '1, 0, 1': ['Лиловый', 'Кондратьев'],
+    '0.9843137, 0.7372549, 0.015686275': ['Грязно-оранжевый', 'Савченков'],
+    '1.0, 0.6, 0.0': ['Оранжевый', None],
+    '0.49803922, 0.3764706, 0.0': ['Оливковый', None],
+    '0.6, 0.0, 1.0': ['Фиолетовый', None],
+    '1, 0, 0': ['Красный', None],
+    '1, 1, 1': ['Белый', None],
+    '0': None
+}
+users = {
 
-def get_colour_name(requested_colour):
-    try:
-        closest_name = actual_name = webcolors.rgb_to_name(requested_colour)
-    except ValueError:
-        closest_name = closest_colour(requested_colour)
-        actual_name = None
-    return actual_name, closest_name
+}
 
+async def fill_colors(session):
+    for color, data in colors.items():
+        if isinstance(data, list):
+            query = await session.execute(
+                insert(Color).values(
+                    name=data[0],
+                    rgb=color
+                )
+            )
 
-def main():
-    result = {}
-    for i in colors:
-        for _, value in i.items():
-            h, s, v = value.split(', ')
-            h, s, v = float(h), float(s), float(v)
-            rgb = [int(round(c * 255)) for c in [h, s, v]]
-            aname, cname = get_colour_name(tuple(rgb))
-            print(f"Actual name: {aname}, closest name: {cname}")
-            result[cname] = [h, s, v]
-    with open('colors.json', 'w') as f:
-        json.dump(result, f, indent=4)
-            
-            
+async def fill_users(session):
+    for color, data in colors.items():
+        colorq = await session.execute(
+            select(Color.id).filter(Color.rgb == color)
+        )
+        color_id = colorq.scalar()
+
+        if isinstance(data, list):
+            if data[1]:
+                query = await session.execute(
+                    insert(User).values(
+                        telegram_id=random.randint(100000, 999999),
+                        first_name=data[1],
+                        role=UserRole.MEMBER.value,
+                        color_id=color_id
+                    )
+                )
+
+async def create_tables(engine, session):
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
+        await conn.run_sync(Base.metadata.create_all)
+
+    await fill_colors(session)
+    await fill_users(session)
+    await session.commit()
+
+async def main():
+    engine = create_async_engine(url='sqlite+aiosqlite:///test.db')
+    db_session = async_sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
+    async with db_session() as session:
+        # await create_tables(engine, session)
+        result = await SheetRepository(session).get_user_fcolor('0, 1, 0')
+        print(result, result.telegram_id, result.first_name)
+        print(result.color, result.color.name)
+
+        
+    
 
 
 
 if __name__ == '__main__':
-    main()
+    asyncio.run(main())
