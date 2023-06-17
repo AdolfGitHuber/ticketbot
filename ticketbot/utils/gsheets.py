@@ -4,6 +4,8 @@ import asyncio
 import aiosqlite
 
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
+from sqlalchemy.sql import text
 from googleapiclient.discovery import build
 from google.oauth2.service_account import Credentials
 from pathlib import Path
@@ -64,31 +66,29 @@ class GoogleSheetTracker:
         result = []
         num_requests = 0
         values = self.service.spreadsheets().values().get(spreadsheetId=self.sheet_id, range=self.sheet_idrange_name).execute().get('values', [])
-        db_data = await self.db.execute('SELECT * FROM sheet').fetchall()
+        db_data = await self.db.execute(text('SELECT * FROM sheet'))
+        db_data = db_data.fetchall()
 
         for row_idx, row in enumerate(values, start=4):
             for col_idx, cell_value in enumerate(row, start=548):
                 request = self.find_data(f'{row_idx}, {col_idx}', db_data)
-
                 if request is None:
-                    request = [f'{row_idx}, {col_idx}', '0', None, int(time.time())]
-
+                    request = [f'{row_idx}, {col_idx}', '0', None, int(time.time()), 'Не известно']
                 if not (request[2] is None and cell_value == '') and request[2] != cell_value and num_requests < 59:
                     num_requests += 1
                     print('Request: ', num_requests)
                     cell_data = self.service.spreadsheets().get(spreadsheetId=self.sheet_id, ranges=self.get_cell_address(row_idx, col_idx), includeGridData=True).execute()
                     cell = cell_data['sheets'][0]['data'][0]['rowData'][0]['values'][0]
                     color = ', '.join(str(cell['effectiveFormat']['backgroundColor'].get(key, 0)) for key in ['red', 'green', 'blue'])
-                    new_cell = {'cell': f'{row_idx}, {col_idx}',
-                                'color': color, 'value': cell_value,
-                                'date': int(time.time())}
-                    old_cell = {'cell': request[0],
-                                'color': request[1], 'value': request[2],
-                                'date': request[3]}
+                    worker = await SheetRepository(self.db).get_user_fcolor(color)
+                    if worker is None:
+                        worker = 'Не известно'
+                    else:
+                        worker = f'{worker.color.name}({worker.first_name})'
+                    new_cell = {'cell': f'{row_idx}, {col_idx}', 'color': color, 'worker': worker, 'value': cell_value, 'date': int(time.time())}
+                    old_cell = {'cell': request[0], 'color': request[1], 'value': request[2], 'worker': request[4], 'date': request[3]}
                     result.append({'old': old_cell, 'new': new_cell})
-                    await self.db.execute('UPDATE sheet SET color = ?, value = ?, date = ? WHERE cell = ?',
-                               (color, cell_value, int(time.time()), f'{row_idx}, {col_idx}',))
-                    
+                    await self.db.execute(text('UPDATE sheet SET color = :1, value = :2, worker = :3, date = :4 WHERE cell = :5'), {'1': color, '2': cell_value, '4': int(time.time()), '3': worker, '5': f'{row_idx}, {col_idx}'})
                 if num_requests >= 59:
                     print(f'Requests: {num_requests}, sleeping')
                     await asyncio.sleep(60)
